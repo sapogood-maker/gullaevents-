@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gulla_events_db
+    environment:
+      POSTGRES_USER: gulla_user
+      POSTGRES_PASSWORD: gulla_password
+      POSTGRES_DB: gulla_events
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - gulla_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gulla_user -d gulla_events"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: gulla_events_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://gulla_user:gulla_password@postgres:5432/gulla_events
+      JWT_SECRET: dev-secret-key-change-in-production
+      QR_SECRET_KEY: dev-qr-secret-key-change-in-production
+      CORS_ORIGIN: http://localhost:3000,http://localhost:8080,http://localhost:5173
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    networks:
+      - gulla_network
+    command: npm run dev
+
+volumes:
+  postgres_data:
+
+networks:
+  gulla_network:
+    driver: bridge
