@@ -1,0 +1,55 @@
+{
+  "applicationId": "gulla-events-backend",
+  "name": "GullaEvents Backend",
+  "description": "Plataforma modular para gestão de eventos com QR Code e carteira digital",
+  "documentation": "https://github.com/sapogood-maker/gullaevents-",
+  "dockerfile": "Dockerfile",
+  "port": 3000,
+  "baseDirectory": "./",
+  "buildPack": "dockerfile",
+  "publishDirectory": null,
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "startCommand": "npm start",
+  "environment": [
+    {
+      "name": "NODE_ENV",
+      "defaultValue": "production"
+    },
+    {
+      "name": "PORT",
+      "defaultValue": "3000"
+    },
+    {
+      "name": "DATABASE_URL",
+      "required": true
+    },
+    {
+      "name": "JWT_SECRET",
+      "required": true
+    },
+    {
+      "name": "JWT_EXPIRES_IN",
+      "defaultValue": "24h"
+    },
+    {
+      "name": "QR_SECRET_KEY",
+      "required": true
+    },
+    {
+      "name": "CORS_ORIGIN",
+      "required": true
+    },
+    {
+      "name": "LOG_LEVEL",
+      "defaultValue": "info"
+    }
+  ],
+  "healthCheck": {
+    "path": "/api/health",
+    "interval": 30,
+    "timeout": 10
+  },
+  "networks": ["internal"],
+  "exposePort": 3000
+}
